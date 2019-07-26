@@ -1,0 +1,43 @@
+/*----user creation-----*/
+conn /as sysdba;
+create or replace user shoppers_den identified by admin5;
+grant connect,resource to shoppers_den;
+disconn sys;
+conn shoppers_den/admin5;
+/*-------done now execute the following queries------*/
+
+/*+++++++the following are independent tables+++++++ */
+
+/*user role table (meta data for user role)*/
+create table user_roles(role_id number(3) constraint user_role_pk primary key,role_name varchar2(6));
+
+/*security question and answer  table (meta data for security code during forget pasword)*/
+create table security_question(seq_id number(3) constraint sec_que_pk primary key,questions varchar2(30)constraint seq_que_nn not null);
+
+/*help desk*/  
+create table help_desk(help_id number(3)constraint help_id_pk primary key,email varchar2(30) constraint help_email_nn not null,query varchar2(150),newsletter number(1));
+
+/*product table*/
+create table product_details(pro_id number(3) constraint pro_detail_pk primary key,pro_name varchar2(15),pro_speci varchar2(55),price number(10,2),qty number(3),img_url varchar2(40),active number(1),created_by number(3),created_on date,updated_by number(3),updated_on date);
+
+/*@@@@@@@@@@@@the following tables are dependent tables@@@@@@@@@@@@ */
+/*customer table */
+create table customer(cust_id number(3) constraint cust_pk primary key,cust_name varchar2(30),email varchar2(30) constraint cust_unique unique,phone number(13),password varchar2(15) ,sec_q_id number(3) constraint cust_security_que_fk references security_question(seq_id) on delete set null,sec_ans varchar2(15) ,created_by number(3),created_on date,role_id number(3) constraint cust_nn not null,active number(1));
+
+
+/*sales table*/
+create table sales_details(sale_id number(3) constraint sales_details_pk primary key,pro_id number(3) constraint sales_details_fk references product_details(pro_id),cust_id number(3) constraint sale_details_fk references customer(cust_id),qty number(3),discount number(7,2),sale_date date,delivered number(1));
+
+/*address details*/
+create table address_details(add_id number(3) constraint address_details_pk primary key,cust_id number(3) constraint address_detail_fk references customer(cust_id),address varchar2(70),active_stat number(1));
+
+/*cart details*/
+create table cart_details(cart_id number(3) constraint cart_details_pk primary key,cust_id number(3) constraint cart_detail_fk references customer(cust_id),pro_id number(3) constraint cart_details_fk references product_details(pro_id),wish_check number(1),cart_check number(1));
+
+/*=======some additional commands=====*/
+cl scr;
+select * from tab;
+disconn shoppers_den
+
+
+
